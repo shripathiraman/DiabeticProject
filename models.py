@@ -15,6 +15,7 @@ InterventionStatus = Literal[
 
 
 class Encounter(BaseModel):
+    """Represents a single patient hospital encounter with calculated risk score and level."""
     encounter_id: int
     patient_nbr: int
     age: str
@@ -32,6 +33,7 @@ class Encounter(BaseModel):
 
 
 class Intervention(BaseModel):
+    """Represents a care intervention record for high or medium risk encounters."""
     intervention_id: int
     encounter_id: int
     status: InterventionStatus
@@ -42,6 +44,7 @@ class Intervention(BaseModel):
 
 
 class CareQueueItem(Encounter):
+    """Combines patient encounter details with its corresponding care intervention status."""
     intervention_id: int
     status: InterventionStatus
     assigned_to: Optional[str] = None
@@ -51,12 +54,14 @@ class CareQueueItem(Encounter):
 
 
 class InterventionUpdate(BaseModel):
+    """Request payload for updating intervention status, assignment, or notes."""
     status: Optional[str] = None
     assigned_to: Optional[str] = None
     notes: Optional[str] = None
 
 
 class OperationsSummary(BaseModel):
+    """Summary metrics of patient encounter risk tiers and intervention queue progress."""
     total_encounters: int
     high_risk: int
     medium_risk: int
@@ -66,6 +71,7 @@ class OperationsSummary(BaseModel):
 
 
 class RiskGroupReadmissionAnalysis(BaseModel):
+    """Readmission metrics for a specific risk level group (e.g., HIGH, MEDIUM, LOW)."""
     risk_level: RiskLevel
     total_patients: int
     readmitted_under_30_days: int
@@ -73,6 +79,7 @@ class RiskGroupReadmissionAnalysis(BaseModel):
 
 
 class ReadmissionAnalysis(BaseModel):
+    """Aggregated 30-day readmission analysis overall and broken down by risk group."""
     total_encounters: int
     readmitted_under_30_days: int
     readmission_rate: float
@@ -80,6 +87,7 @@ class ReadmissionAnalysis(BaseModel):
 
 
 class ManagementDashboard(BaseModel):
+    """Executive dashboard metrics summarizing care queue volume and high-risk readmission rate."""
     total_encounters: int
     care_queue_size: int
     high_risk_queue: int

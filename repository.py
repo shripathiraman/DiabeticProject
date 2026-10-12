@@ -65,6 +65,9 @@ CARE_QUEUE_SELECT_COLUMNS = """
 
 
 def _fetch_all(sql: str, params: tuple[Any, ...] = ()) -> list[dict[str, Any]]:
+    """
+    Execute a SELECT query and return all matching rows as a list of dictionaries.
+    """
     conn = get_dict_connection()
     try:
         with conn.cursor() as cursor:
@@ -75,6 +78,9 @@ def _fetch_all(sql: str, params: tuple[Any, ...] = ()) -> list[dict[str, Any]]:
 
 
 def _fetch_one(sql: str, params: tuple[Any, ...] = ()) -> Optional[dict[str, Any]]:
+    """
+    Execute a SELECT query and return a single row as a dictionary, or None if not found.
+    """
     conn = get_dict_connection()
     try:
         with conn.cursor() as cursor:
@@ -86,6 +92,9 @@ def _fetch_one(sql: str, params: tuple[Any, ...] = ()) -> Optional[dict[str, Any
 
 
 def get_encounters(limit: int = 100, offset: int = 0) -> list[dict[str, Any]]:
+    """
+    Retrieve a paginated list of patient encounters ordered by encounter_id.
+    """
     sql = f"""
         SELECT {ENCOUNTER_SELECT_COLUMNS}
         FROM patient_encounters
@@ -96,6 +105,9 @@ def get_encounters(limit: int = 100, offset: int = 0) -> list[dict[str, Any]]:
 
 
 def get_encounter_by_id(encounter_id: int) -> Optional[dict[str, Any]]:
+    """
+    Fetch a single patient encounter by its encounter ID.
+    """
     sql = f"""
         SELECT {ENCOUNTER_SELECT_COLUMNS}
         FROM patient_encounters
@@ -110,6 +122,9 @@ def get_care_queue(
     limit: int = 100,
     offset: int = 0,
 ) -> list[dict[str, Any]]:
+    """
+    Retrieve prioritized care queue records for medium and high risk encounters with optional filters.
+    """
     risk_levels = ["HIGH"] if high_only else ["MEDIUM", "HIGH"]
     where_clauses = ["e.risk_level = ANY(%s)"]
     params: list[Any] = [risk_levels]
@@ -142,6 +157,9 @@ def update_intervention(
     assigned_to: Optional[str] = None,
     notes: Optional[str] = None,
 ) -> Optional[dict[str, Any]]:
+    """
+    Update intervention workflow attributes (status, assignee, notes) for a given encounter ID.
+    """
     updates = []
     params: list[Any] = []
 
@@ -190,6 +208,9 @@ def update_intervention(
 
 
 def get_intervention_by_encounter_id(encounter_id: int) -> Optional[dict[str, Any]]:
+    """
+    Fetch care intervention details for a specific encounter ID.
+    """
     sql = """
         SELECT
             intervention_id,
@@ -206,6 +227,9 @@ def get_intervention_by_encounter_id(encounter_id: int) -> Optional[dict[str, An
 
 
 def get_operations_summary() -> dict[str, Any]:
+    """
+    Calculate high-level operational counts across encounter risk tiers and intervention statuses.
+    """
     sql = """
         SELECT
             COUNT(*) AS total_encounters,
@@ -228,6 +252,9 @@ def get_operations_summary() -> dict[str, Any]:
 
 
 def get_readmission_analysis() -> dict[str, Any]:
+    """
+    Calculate 30-day readmission totals and rates overall and grouped by patient risk level.
+    """
     total_sql = """
         SELECT
             COUNT(*) AS total_encounters,
@@ -266,6 +293,9 @@ def get_readmission_analysis() -> dict[str, Any]:
 
 
 def get_management_dashboard() -> dict[str, Any]:
+    """
+    Aggregate key summary metrics and high-risk readmission rate for executive leadership.
+    """
     summary = get_operations_summary()
     analysis = get_readmission_analysis()
 
@@ -287,6 +317,9 @@ def get_management_dashboard() -> dict[str, Any]:
 
 
 def upsert_patient_encounters(records: list[dict[str, Any]]) -> int:
+    """
+    Insert or update multiple patient encounter records in batch mode.
+    """
     if not records:
         return 0
 
@@ -343,6 +376,9 @@ def upsert_patient_encounters(records: list[dict[str, Any]]) -> int:
 
 
 def create_care_interventions_for_queue() -> int:
+    """
+    Populate care_interventions table for encounters classified as MEDIUM or HIGH risk.
+    """
     sql = """
         INSERT INTO care_interventions (encounter_id)
         SELECT encounter_id

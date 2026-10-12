@@ -24,7 +24,7 @@ INTEGER_COLUMNS = [
 
 def load_dataset(csv_path: Path = DATA_FILE) -> pd.DataFrame:
     """
-    Read the diabetes dataset and keep only the assignment columns.
+    Load the diabetes CSV dataset, filter for required columns, and cast column types.
     """
     if not csv_path.exists():
         raise FileNotFoundError(f"Dataset not found: {csv_path}")
@@ -42,13 +42,16 @@ def load_dataset(csv_path: Path = DATA_FILE) -> pd.DataFrame:
 
 def prepare_encounters(df: pd.DataFrame) -> list[dict]:
     """
-    Convert dataset rows into scored encounter records.
+    Convert DataFrame rows into dictionaries and assign calculated risk scores to each encounter.
     """
     records = df.to_dict(orient="records")
     return [score_encounter(record) for record in records]
 
 
 def main():
+    """
+    Orchestrate the loading pipeline: read CSV, calculate risk scores, and persist encounters and care queue interventions in the database.
+    """
     print(f"Loading dataset from {DATA_FILE}")
 
     df = load_dataset(DATA_FILE)
