@@ -70,33 +70,33 @@ Risk level mapping:
 Healthcare CSV Dataset
         |
         v
-backend/data_loader.py
+backend/scripts/data_loader.py (ETL & Risk Scoring)
         |
         v
-PostgreSQL
+PostgreSQL (patient_encounters, care_interventions)
         ^
         |
-backend/repository.py
+backend/app/db.py (Connection Pool & Query Helpers)
         ^
         |
-backend/service.py
+backend/app/routes.py (FastAPI Endpoints & Business Logic)
         ^
         |
-backend/main.py / FastAPI
+backend/app/main.py (FastAPI App & CORS)
         ^
         |
-Swagger / API Consumer
+Swagger (/docs) & React Frontend
 ```
 
-Layer responsibilities:
+File responsibilities:
 
-- `backend/database.py`: PostgreSQL connection configuration.
-- `backend/schema.sql`: database tables, constraints, indexes, and timestamp trigger.
-- `backend/service.py`: business rules, scoring, risk levels, and validation.
-- `backend/repository.py`: SQL queries and persistence logic.
-- `backend/data_loader.py`: CSV ingestion and initial intervention queue creation.
-- `backend/models.py`: API request and response models.
-- `backend/main.py`: FastAPI routes and HTTP error handling.
+- `backend/app/config.py`: Environment variables and PostgreSQL connection settings.
+- `backend/app/db.py`: Database connection lifecycle, context managers (`get_db`), and query helpers (`fetch_all`, `fetch_one`).
+- `backend/app/models.py`: Pydantic data models for request validation and response serialization.
+- `backend/app/risk.py`: Pure business logic for the explainable risk scoring rules.
+- `backend/app/routes.py`: FastAPI endpoints connecting HTTP requests directly to database operations.
+- `backend/app/main.py`: Application entrypoint, CORS configuration, and router registration.
+- `backend/scripts/data_loader.py`: Ingestion pipeline loading the CSV into PostgreSQL and creating intervention records.
 
 ## API Endpoints
 
@@ -134,13 +134,13 @@ psql -U postgres -d fde_db -f D:\fdetraining\DiabeticProject\backend\schema.sql
 Load the dataset:
 
 ```powershell
-python -m backend.data_loader
+python -m backend.scripts.data_loader
 ```
 
 Start the API:
 
 ```powershell
-python -m uvicorn backend.main:app --reload
+python -m uvicorn backend.app.main:app --reload
 ```
 
 Open Swagger:

@@ -7,7 +7,9 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "encounter": "node --experimental-strip-types src/encounter.ts",
+    "fetch-apis": "node --experimental-strip-types src/fetchApis.ts"
   },
   "dependencies": {
     "react": "^19.2.8",

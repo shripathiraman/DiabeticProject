@@ -1,10 +1,9 @@
 from datetime import datetime
-from typing import List, Literal, Optional
-
+from typing import Literal, Optional
 from pydantic import BaseModel
 
-
 RiskLevel = Literal["LOW", "MEDIUM", "HIGH"]
+
 InterventionStatus = Literal[
     "PENDING_REVIEW",
     "ASSIGNED",
@@ -44,7 +43,7 @@ class Intervention(BaseModel):
 
 
 class CareQueueItem(Encounter):
-    """Combines patient encounter details with its corresponding care intervention status."""
+    """Combines patient encounter details with care intervention tracking."""
     intervention_id: int
     status: InterventionStatus
     assigned_to: Optional[str] = None
@@ -54,7 +53,7 @@ class CareQueueItem(Encounter):
 
 
 class InterventionUpdate(BaseModel):
-    """Request payload for updating intervention status, assignment, or notes."""
+    """Request payload for updating intervention status, assignee, or notes."""
     status: Optional[str] = None
     assigned_to: Optional[str] = None
     notes: Optional[str] = None
@@ -71,7 +70,7 @@ class OperationsSummary(BaseModel):
 
 
 class RiskGroupReadmissionAnalysis(BaseModel):
-    """Readmission metrics for a specific risk level group (e.g., HIGH, MEDIUM, LOW)."""
+    """Readmission metrics for a specific risk level group."""
     risk_level: RiskLevel
     total_patients: int
     readmitted_under_30_days: int
@@ -79,15 +78,15 @@ class RiskGroupReadmissionAnalysis(BaseModel):
 
 
 class ReadmissionAnalysis(BaseModel):
-    """Aggregated 30-day readmission analysis overall and broken down by risk group."""
+    """Aggregated 30-day readmission analysis overall and by risk group."""
     total_encounters: int
     readmitted_under_30_days: int
     readmission_rate: float
-    risk_groups: List[RiskGroupReadmissionAnalysis]
+    risk_groups: list[RiskGroupReadmissionAnalysis]
 
 
 class ManagementDashboard(BaseModel):
-    """Executive dashboard metrics summarizing care queue volume and high-risk readmission rate."""
+    """Executive dashboard metrics summarizing care queue volume and high-risk readmissions."""
     total_encounters: int
     care_queue_size: int
     high_risk_queue: int
