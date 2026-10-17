@@ -2,8 +2,8 @@ from pathlib import Path
 
 import pandas as pd
 
-from repository import create_care_interventions_for_queue, upsert_patient_encounters
-from service import REQUIRED_DATASET_COLUMNS, score_encounter
+from .repository import create_care_interventions_for_queue, upsert_patient_encounters
+from .service import REQUIRED_DATASET_COLUMNS, score_encounter
 
 
 DATA_FILE = Path(__file__).resolve().parent / "data" / "diabetic_data.csv"

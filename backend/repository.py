@@ -2,8 +2,8 @@ from typing import Any, Optional
 
 from psycopg2.extras import execute_values
 
-from database import get_connection, get_dict_connection
-from service import calculate_rate, normalize_intervention_status
+from .database import get_connection, get_dict_connection
+from .service import calculate_rate, normalize_intervention_status
 
 
 PATIENT_ENCOUNTER_COLUMNS = [

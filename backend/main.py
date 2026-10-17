@@ -2,8 +2,8 @@ from typing import List, Optional
 
 from fastapi import FastAPI, HTTPException, Query
 
-import repository
-from models import (
+from . import repository
+from .models import (
     CareQueueItem,
     Encounter,
     Intervention,

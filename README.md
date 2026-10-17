@@ -70,19 +70,19 @@ Risk level mapping:
 Healthcare CSV Dataset
         |
         v
-data_loader.py
+backend/data_loader.py
         |
         v
 PostgreSQL
         ^
         |
-repository.py
+backend/repository.py
         ^
         |
-service.py
+backend/service.py
         ^
         |
-main.py / FastAPI
+backend/main.py / FastAPI
         ^
         |
 Swagger / API Consumer
@@ -90,13 +90,13 @@ Swagger / API Consumer
 
 Layer responsibilities:
 
-- `database.py`: PostgreSQL connection configuration.
-- `schema.sql`: database tables, constraints, indexes, and timestamp trigger.
-- `service.py`: business rules, scoring, risk levels, and validation.
-- `repository.py`: SQL queries and persistence logic.
-- `data_loader.py`: CSV ingestion and initial intervention queue creation.
-- `models.py`: API request and response models.
-- `main.py`: FastAPI routes and HTTP error handling.
+- `backend/database.py`: PostgreSQL connection configuration.
+- `backend/schema.sql`: database tables, constraints, indexes, and timestamp trigger.
+- `backend/service.py`: business rules, scoring, risk levels, and validation.
+- `backend/repository.py`: SQL queries and persistence logic.
+- `backend/data_loader.py`: CSV ingestion and initial intervention queue creation.
+- `backend/models.py`: API request and response models.
+- `backend/main.py`: FastAPI routes and HTTP error handling.
 
 ## API Endpoints
 
@@ -116,7 +116,7 @@ Layer responsibilities:
 Install dependencies:
 
 ```powershell
-pip install -r requirements.txt
+pip install -r backend/requirements.txt
 ```
 
 Create the PostgreSQL database:
@@ -128,19 +128,19 @@ CREATE DATABASE fde_db;
 Run the schema:
 
 ```powershell
-psql -U postgres -d fde_db -f D:\fdetraining\DiabeticProject\schema.sql
+psql -U postgres -d fde_db -f D:\fdetraining\DiabeticProject\backend\schema.sql
 ```
 
 Load the dataset:
 
 ```powershell
-python data_loader.py
+python -m backend.data_loader
 ```
 
 Start the API:
 
 ```powershell
-python -m uvicorn main:app --reload
+python -m uvicorn backend.main:app --reload
 ```
 
 Open Swagger:
