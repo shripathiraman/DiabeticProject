@@ -5,12 +5,14 @@ from .db import fetch_all, fetch_one, get_dict_connection
 from .models import (
     CareQueueItem,
     Encounter,
+    EncounterCreate,
     Intervention,
     InterventionUpdate,
     ManagementDashboard,
     OperationsSummary,
     ReadmissionAnalysis,
 )
+from .risk import score_encounter
 
 router = APIRouter()
 
@@ -55,6 +57,38 @@ def health_check():
 # ---------------------------------------------------------------------------
 # 2. Encounters Endpoints
 # ---------------------------------------------------------------------------
+@router.post("/encounters", response_model=Encounter, status_code=201, tags=["Encounters"])
+def create_encounter(payload: EncounterCreate):
+    encounter = score_encounter(payload.model_dump())
+    columns = (
+        "encounter_id", "patient_nbr", "age", "time_in_hospital",
+        "number_inpatient", "number_emergency", "number_outpatient",
+        "num_medications", "num_lab_procedures", "discharge_disposition_id",
+        "admission_type_id", "readmitted", "risk_score", "risk_level",
+    )
+    values = tuple(encounter[column] for column in columns)
+    placeholders = ", ".join(["%s"] * len(columns))
+
+    sql = f"""
+        INSERT INTO patient_encounters ({", ".join(columns)})
+        VALUES ({placeholders})
+        RETURNING {", ".join(columns)};
+    """
+
+    conn = get_dict_connection()
+    try:
+        with conn.cursor() as cursor:
+            cursor.execute(sql, values)
+            inserted_encounter = cursor.fetchone()
+        conn.commit()
+        return dict(inserted_encounter)
+    except Exception:
+        conn.rollback()
+        raise
+    finally:
+        conn.close()
+
+        
 @router.get("/encounters", response_model=list[Encounter], tags=["Encounters"])
 def list_encounters(
     limit: int = Query(default=100, ge=1, le=1000),
@@ -302,3 +336,5 @@ def get_management_dashboard():
         "completed_interventions": ops["completed_interventions"],
         "high_risk_readmission_rate": high_risk_rate,
     }
+
+

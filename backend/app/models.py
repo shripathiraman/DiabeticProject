@@ -31,6 +31,21 @@ class Encounter(BaseModel):
     risk_level: RiskLevel
 
 
+class EncounterCreate(BaseModel):
+    encounter_id: int
+    patient_nbr: int
+    age: str
+    time_in_hospital: int
+    number_inpatient: int
+    number_emergency: int
+    number_outpatient: int
+    num_medications: int
+    num_lab_procedures: int
+    discharge_disposition_id: int
+    admission_type_id: int
+    readmitted: str
+
+
 class Intervention(BaseModel):
     """Represents a care intervention record for high or medium risk encounters."""
     intervention_id: int
