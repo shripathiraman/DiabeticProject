@@ -10,9 +10,12 @@ from .models import (
     InterventionUpdate,
     ManagementDashboard,
     OperationsSummary,
+    PatientSearchResult,
     ReadmissionAnalysis,
+    RiskLevel,
 )
 from .risk import score_encounter
+from . import service
 
 router = APIRouter()
 
@@ -119,7 +122,33 @@ def get_encounter(encounter_id: int):
 
 
 # ---------------------------------------------------------------------------
-# 3. Care Queue Endpoints
+# 3. Patient Search Endpoints
+# ---------------------------------------------------------------------------
+@router.get("/patients/search", response_model=list[PatientSearchResult], tags=["Patient Search"])
+@router.get("/api/patients/search", response_model=list[PatientSearchResult], tags=["Patient Search"], include_in_schema=False)
+def search_patients(
+    patient_nbr: Optional[int] = Query(default=None, description="Search by Patient Number (ID)"),
+    risk_score: Optional[int] = Query(default=None, ge=0, le=8, description="Filter by Risk Score (0-8)"),
+    risk_level: Optional[RiskLevel] = Query(default=None, description="Filter by Risk Level (LOW, MEDIUM, HIGH)"),
+    limit: int = Query(default=50, ge=1, le=500, description="Max number of records to return"),
+    offset: int = Query(default=0, ge=0, description="Pagination offset"),
+):
+    """
+    Search for patient encounters by Patient ID (patient_nbr), Risk Score, and/or Risk Level.
+    Any combination of filters can be provided ('and/or').
+    Returns patient encounter details enriched with care intervention status.
+    """
+    return service.search_patients(
+        patient_nbr=patient_nbr,
+        risk_score=risk_score,
+        risk_level=risk_level,
+        limit=limit,
+        offset=offset,
+    )
+
+
+# ---------------------------------------------------------------------------
+# 4. Care Queue Endpoints
 # ---------------------------------------------------------------------------
 def _query_care_queue(
     risk_levels: list[str],

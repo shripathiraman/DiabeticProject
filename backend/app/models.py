@@ -31,6 +31,29 @@ class Encounter(BaseModel):
     risk_level: RiskLevel
 
 
+class PatientSearchResult(BaseModel):
+    """Represents a patient encounter search result, optionally enriched with care intervention details."""
+    encounter_id: int
+    patient_nbr: int
+    age: str
+    time_in_hospital: int
+    number_inpatient: int
+    number_emergency: int
+    number_outpatient: int
+    num_medications: int
+    num_lab_procedures: int
+    discharge_disposition_id: int
+    admission_type_id: int
+    readmitted: str
+    risk_score: int
+    risk_level: RiskLevel
+    intervention_id: Optional[int] = None
+    status: Optional[str] = None
+    intervention_status: Optional[str] = None
+    assigned_to: Optional[str] = None
+    notes: Optional[str] = None
+
+
 class EncounterCreate(BaseModel):
     encounter_id: int
     patient_nbr: int
