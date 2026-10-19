@@ -64,3 +64,33 @@ CREATE INDEX IF NOT EXISTS idx_care_interventions_status
 
 CREATE INDEX IF NOT EXISTS idx_care_interventions_assigned_to
     ON care_interventions(assigned_to);
+
+-- Care Intervention Audit History Table (Stretch Goal & Enterprise Audit Trail)
+CREATE TABLE IF NOT EXISTS care_intervention_history (
+    history_id BIGSERIAL PRIMARY KEY,
+    encounter_id BIGINT NOT NULL REFERENCES patient_encounters(encounter_id) ON DELETE CASCADE,
+    intervention_id BIGINT REFERENCES care_interventions(intervention_id) ON DELETE CASCADE,
+    status VARCHAR(30) NOT NULL,
+    assigned_to VARCHAR(100),
+    notes TEXT,
+    changed_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE OR REPLACE FUNCTION log_care_intervention_history()
+RETURNS TRIGGER AS $$
+BEGIN
+    INSERT INTO care_intervention_history (encounter_id, intervention_id, status, assigned_to, notes, changed_at)
+    VALUES (NEW.encounter_id, NEW.intervention_id, NEW.status, NEW.assigned_to, NEW.notes, NOW());
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS care_interventions_audit_trail ON care_interventions;
+
+CREATE TRIGGER care_interventions_audit_trail
+AFTER INSERT OR UPDATE ON care_interventions
+FOR EACH ROW
+EXECUTE FUNCTION log_care_intervention_history();
+
+CREATE INDEX IF NOT EXISTS idx_care_intervention_history_encounter
+    ON care_intervention_history(encounter_id, changed_at DESC);

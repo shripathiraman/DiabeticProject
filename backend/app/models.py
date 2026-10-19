@@ -100,6 +100,17 @@ class InterventionUpdate(BaseModel):
     notes: Optional[str] = None
 
 
+class InterventionHistoryItem(BaseModel):
+    """Represents a single immutable historical audit log entry for a care intervention."""
+    history_id: int
+    encounter_id: int
+    patient_nbr: Optional[int] = None
+    status: InterventionStatus
+    assigned_to: Optional[str] = None
+    notes: Optional[str] = None
+    changed_at: datetime
+
+
 class OperationsSummary(BaseModel):
     """Summary metrics of patient encounter risk tiers and intervention queue progress."""
     total_encounters: int

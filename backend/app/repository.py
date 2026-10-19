@@ -279,6 +279,25 @@ def update_intervention(
         conn.close()
 
 
+def get_intervention_history(encounter_id: int) -> list[dict[str, Any]]:
+    """Fetch complete immutable audit history for an encounter from care_intervention_history."""
+    sql = """
+        SELECT 
+            h.history_id,
+            h.encounter_id,
+            e.patient_nbr,
+            h.status,
+            h.assigned_to,
+            h.notes,
+            h.changed_at
+        FROM care_intervention_history h
+        JOIN patient_encounters e ON e.encounter_id = h.encounter_id
+        WHERE h.encounter_id = %s
+        ORDER BY h.changed_at DESC, h.history_id DESC;
+    """
+    return fetch_all(sql, (encounter_id,))
+
+
 # ---------------------------------------------------------------------------
 # Operations & Analytics
 # ---------------------------------------------------------------------------

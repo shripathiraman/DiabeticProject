@@ -11,6 +11,7 @@ from .models import (
     Encounter,
     EncounterCreate,
     Intervention,
+    InterventionHistoryItem,
     InterventionUpdate,
     ManagementDashboard,
     OperationsSummary,
@@ -175,6 +176,19 @@ def update_intervention(encounter_id: int, payload: InterventionUpdate):
         )
 
     return updated_row
+
+
+@router.get("/interventions/{encounter_id}/history", response_model=list[InterventionHistoryItem], tags=["Interventions"])
+@router.get("/api/interventions/{encounter_id}/history", response_model=list[InterventionHistoryItem], tags=["Interventions"], include_in_schema=False)
+def get_intervention_history(encounter_id: int):
+    """Fetch complete immutable audit history for an encounter from care_intervention_history table."""
+    encounter = repository.get_encounter_by_id(encounter_id)
+    if not encounter:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Encounter {encounter_id} not found.",
+        )
+    return repository.get_intervention_history(encounter_id)
 
 
 # ---------------------------------------------------------------------------

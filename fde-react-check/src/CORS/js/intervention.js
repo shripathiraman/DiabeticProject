@@ -123,8 +123,8 @@ async function fetchInterventionStatus(encounterId) {
         // Populate Form Fields
         populateForm(data);
 
-        // Load or initialize updates history from session storage
-        loadUpdateHistory(data.encounter_id, data);
+        // Fetch audit history directly from PostgreSQL care_intervention_history table
+        await fetchInterventionHistory(data.encounter_id);
 
         updateStatusPill(true, 'API Connected (Port 8000)');
     } catch (error) {
@@ -200,20 +200,10 @@ async function submitInterventionUpdate(e) {
         // Update form values and badges
         populateForm(updatedData);
 
-        // Record update entry in history
-        const record = {
-            timestamp: new Date().toISOString(),
-            encounter_id: updatedData.encounter_id,
-            patient_nbr: updatedData.patient_nbr || state.patientNbr || '-',
-            status: updatedData.status,
-            assigned_to: updatedData.assigned_to || 'Unassigned',
-            notes: updatedData.notes || 'No notes provided',
-            isLatest: true,
-        };
+        // Fetch fresh audit trail from care_intervention_history table
+        await fetchInterventionHistory(encounterId);
 
-        addUpdateHistoryRecord(encounterId, record);
-
-        showSuccess(`Care intervention for Encounter #${encounterId} successfully updated and persisted in database.`);
+        showSuccess(`Care intervention for Encounter #${encounterId} successfully updated and recorded in care_intervention_history table.`);
 
     } catch (error) {
         console.error('Update error:', error);
@@ -263,64 +253,43 @@ function populateForm(data) {
 }
 
 /**
- * Load or initialize history for a specific encounter
+ * Fetch immutable audit trail directly from PostgreSQL care_intervention_history table
  */
-function loadUpdateHistory(encounterId, currentData) {
-    const storageKey = `intervention_updates_${encounterId}`;
-    let history = [];
+async function fetchInterventionHistory(encounterId) {
+    if (!encounterId) return;
 
     try {
-        const stored = sessionStorage.getItem(storageKey);
-        if (stored) {
-            history = JSON.parse(stored);
+        const url = `${CONFIG.BASE_URL}${CONFIG.INTERVENTIONS_ENDPOINT}/${encounterId}/history`;
+        console.log(`[API Call] Fetching audit trail from DB: ${url}`);
+
+        const response = await fetch(url, {
+            method: 'GET',
+            headers: { 'Accept': 'application/json' },
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            state.updatesHistory = Array.isArray(data) ? data : [];
+            renderUpdatesTable();
+        } else {
+            console.warn(`Could not load history for #${encounterId}: ${response.statusText}`);
+            state.updatesHistory = [];
+            renderUpdatesTable();
         }
-    } catch (_) {}
-
-    // If no prior updates recorded in this session, seed with the current record from PostgreSQL
-    if (!history || history.length === 0) {
-        history = [{
-            timestamp: currentData.updated_at || currentData.created_at || new Date().toISOString(),
-            encounter_id: currentData.encounter_id,
-            patient_nbr: currentData.patient_nbr || '-',
-            status: currentData.status,
-            assigned_to: currentData.assigned_to || 'Unassigned',
-            notes: currentData.notes || 'Current active care record',
-            isLatest: true,
-        }];
-        try {
-            sessionStorage.setItem(storageKey, JSON.stringify(history));
-        } catch (_) {}
+    } catch (err) {
+        console.error('Fetch intervention history error:', err);
+        state.updatesHistory = [];
+        renderUpdatesTable();
     }
-
-    state.updatesHistory = history;
-    renderUpdatesTable();
 }
 
 /**
- * Add a new record to the update history and persist
- */
-function addUpdateHistoryRecord(encounterId, record) {
-    // Mark previous latest as not latest
-    state.updatesHistory.forEach(item => item.isLatest = false);
-
-    // Prepend latest update
-    state.updatesHistory.unshift(record);
-
-    const storageKey = `intervention_updates_${encounterId}`;
-    try {
-        sessionStorage.setItem(storageKey, JSON.stringify(state.updatesHistory));
-    } catch (_) {}
-
-    renderUpdatesTable();
-}
-
-/**
- * Render the "List the update here" table
+ * Render the "List the update here" table from the database records
  */
 function renderUpdatesTable() {
     elements.updatesTableBody.innerHTML = '';
     const records = state.updatesHistory || [];
-    elements.updateCountBadge.textContent = `${records.length} Update${records.length === 1 ? '' : 's'}`;
+    elements.updateCountBadge.textContent = `${records.length} Recorded in DB`;
 
     if (records.length === 0) {
         elements.updatesTableContainer.style.display = 'none';
@@ -333,30 +302,31 @@ function renderUpdatesTable() {
 
     const fragment = document.createDocumentFragment();
 
-    records.forEach(item => {
+    records.forEach((item, index) => {
         const tr = document.createElement('tr');
-        if (item.isLatest) {
+        const isLatest = index === 0;
+        if (isLatest) {
             tr.classList.add('latest-update-row');
         }
 
-        const formattedTime = formatTimestamp(item.timestamp);
+        const formattedTime = formatTimestamp(item.changed_at || item.timestamp);
         const statusHtml = createStatusBadgeHtml(item.status);
         const notesHtml = escapeHtml(item.notes || 'None');
         const assignedHtml = escapeHtml(item.assigned_to || 'Unassigned');
         const encounterIdHtml = escapeHtml(String(item.encounter_id));
-        const patientNbrHtml = escapeHtml(String(item.patient_nbr));
+        const patientNbrHtml = escapeHtml(String(item.patient_nbr || state.patientNbr || '-'));
 
         tr.innerHTML = `
             <td>
                 <span class="update-timestamp">${formattedTime}</span>
-                ${item.isLatest ? '<span class="update-tag-latest">LATEST</span>' : ''}
+                ${isLatest ? '<span class="update-tag-latest">LATEST</span>' : ''}
             </td>
             <td><strong>#${encounterIdHtml}</strong></td>
             <td><span class="patient-id-badge">${patientNbrHtml}</span></td>
             <td>${statusHtml}</td>
             <td><span class="assigned-user-pill">${assignedHtml}</span></td>
             <td class="notes-cell">${notesHtml}</td>
-            <td><span class="persisted-pill"><span class="check-icon">&#10003;</span> Persisted</span></td>
+            <td><span class="persisted-pill" title="Saved in PostgreSQL care_intervention_history table"><span class="check-icon">&#10003;</span> Table: care_intervention_history</span></td>
         `;
 
         fragment.appendChild(tr);

@@ -90,6 +90,17 @@ export interface InterventionUpdate {
     notes?: string;
 }
 
+/** Immutable audit history entry from care_intervention_history table */
+export interface InterventionHistoryItem {
+    history_id: number;
+    encounter_id: number;
+    patient_nbr?: number | null;
+    status: InterventionStatus;
+    assigned_to: string | null;
+    notes: string | null;
+    changed_at: string;
+}
+
 /** Filters for patient search (supports ID and/or Risk Score and/or Risk Level) */
 export interface PatientSearchParams {
     patient_nbr?: number;
@@ -256,6 +267,13 @@ export async function updateIntervention(encounterId: number, data: Intervention
     }
 
     return (await response.json()) as Intervention;
+}
+
+/**
+ * 12. GET /interventions/{encounter_id}/history - Fetch immutable audit history from care_intervention_history table
+ */
+export async function fetchInterventionHistory(encounterId: number): Promise<InterventionHistoryItem[]> {
+    return apiGet<InterventionHistoryItem[]>(`/interventions/${encounterId}/history`);
 }
 
 
