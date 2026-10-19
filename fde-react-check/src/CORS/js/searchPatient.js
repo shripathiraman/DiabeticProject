@@ -161,6 +161,7 @@ function renderTable(patients) {
 
     elements.emptyState.style.display = 'none';
     elements.tableContainer.style.display = 'block';
+    elements.tableContainer.scrollLeft = 0;
 
     const fragment = document.createDocumentFragment();
 
@@ -448,4 +449,29 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
     } catch (_) {}
+
+    // Fullscreen table view toggle
+    const fullscreenBtn = document.getElementById('fullscreenToggleBtn');
+    const resultsCard = document.getElementById('resultsCard');
+    const fullscreenText = document.getElementById('fullscreenBtnText');
+
+    if (fullscreenBtn && resultsCard) {
+        fullscreenBtn.addEventListener('click', () => {
+            const isFull = resultsCard.classList.toggle('is-fullscreen');
+            if (fullscreenText) {
+                fullscreenText.textContent = isFull ? 'Exit Full Screen' : 'Full Screen';
+            }
+            if (elements.tableContainer) {
+                elements.tableContainer.scrollLeft = 0;
+            }
+        });
+
+        // Exit full screen with Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && resultsCard.classList.contains('is-fullscreen')) {
+                resultsCard.classList.remove('is-fullscreen');
+                if (fullscreenText) fullscreenText.textContent = 'Full Screen';
+            }
+        });
+    }
 });

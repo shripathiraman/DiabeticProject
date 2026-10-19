@@ -178,7 +178,13 @@
                     </h2>
                 </div>
                 <div class="results-header-actions">
-                    <span class="badge-count" id="updateCountBadge">0 Updates</span>
+                    <span class="badge-count" id="updateCountBadge">0 Records</span>
+                    <button type="button" class="btn btn-secondary btn-sm" id="fullscreenToggleBtn" title="Toggle Full Screen View">
+                        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
+                            <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/>
+                        </svg>
+                        <span id="fullscreenBtnText">Full Screen</span>
+                    </button>
                 </div>
             </div>
 
@@ -215,7 +221,6 @@
                                 <th>Status</th>
                                 <th>Assigned To</th>
                                 <th>Clinical Notes</th>
-                                <th>Persistence</th>
                             </tr>
                         </thead>
                         <tbody id="updatesTableBody">

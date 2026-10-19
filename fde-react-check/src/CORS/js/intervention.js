@@ -289,7 +289,7 @@ async function fetchInterventionHistory(encounterId) {
 function renderUpdatesTable() {
     elements.updatesTableBody.innerHTML = '';
     const records = state.updatesHistory || [];
-    elements.updateCountBadge.textContent = `${records.length} Recorded in DB`;
+    elements.updateCountBadge.textContent = `${records.length} Record${records.length === 1 ? '' : 's'}`;
 
     if (records.length === 0) {
         elements.updatesTableContainer.style.display = 'none';
@@ -326,7 +326,6 @@ function renderUpdatesTable() {
             <td>${statusHtml}</td>
             <td><span class="assigned-user-pill">${assignedHtml}</span></td>
             <td class="notes-cell">${notesHtml}</td>
-            <td><span class="persisted-pill" title="Saved in PostgreSQL care_intervention_history table"><span class="check-icon">&#10003;</span> Table: care_intervention_history</span></td>
         `;
 
         fragment.appendChild(tr);
@@ -513,6 +512,27 @@ document.addEventListener('DOMContentLoaded', () => {
             if (e.key === 'Enter') {
                 e.preventDefault();
                 elements.fetchStatusBtn.click();
+            }
+        });
+    }
+
+    // 6. Fullscreen toggle for updateListCard
+    const fullscreenBtn = document.getElementById('fullscreenToggleBtn');
+    const updateListCard = document.getElementById('updateListCard');
+    const fullscreenText = document.getElementById('fullscreenBtnText');
+
+    if (fullscreenBtn && updateListCard) {
+        fullscreenBtn.addEventListener('click', () => {
+            const isFull = updateListCard.classList.toggle('is-fullscreen');
+            if (fullscreenText) {
+                fullscreenText.textContent = isFull ? 'Exit Full Screen' : 'Full Screen';
+            }
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && updateListCard.classList.contains('is-fullscreen')) {
+                updateListCard.classList.remove('is-fullscreen');
+                if (fullscreenText) fullscreenText.textContent = 'Full Screen';
             }
         });
     }
