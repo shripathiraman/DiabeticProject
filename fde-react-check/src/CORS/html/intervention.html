@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Diabetes Patient Management - View and update intervention care for high-risk patient encounters.">
+    <title>Diabetes Patient Management | Care Intervention</title>
+
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Stylesheet -->
+    <link rel="stylesheet" href="../css/app.css">
+</head>
+<body>
+
+    <!-- Top Application Banner / Header (Wireframe: "Diabetes Patient Management") -->
+    <header class="app-header">
+        <div class="header-container">
+            <div class="header-title-group">
+                <div class="header-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+                    </svg>
+                </div>
+                <h1 class="app-title">Diabetes Patient Management</h1>
+            </div>
+
+            <div class="header-right-group">
+                <!-- Navigation back to search -->
+                <a href="searchPatient.html" class="btn btn-secondary back-nav-btn" id="backToSearchBtn">
+                    <span class="arrow">&larr;</span> Back to Search Patient
+                </a>
+
+                <!-- Backend API Status Indicator -->
+                <div class="api-status-pill" id="apiStatusPill" title="FastAPI Backend Status">
+                    <span class="status-dot" id="statusDot"></span>
+                    <span id="statusText">Checking API...</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="main-wrapper">
+
+        <!-- Notification / Alert Banners -->
+        <div class="error-banner" id="errorBanner" role="alert">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="8" x2="12" y2="12"></line>
+                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+            <div id="errorMessage">An unexpected error occurred.</div>
+        </div>
+
+        <div class="success-banner" id="successBanner" role="status">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+            </svg>
+            <div id="successMessage">Intervention details updated successfully.</div>
+        </div>
+
+        <!-- Upper Card: Intervention Form matching wireframe -->
+        <section class="card" id="interventionCard" aria-labelledby="interventionHeading">
+            <div class="card-header">
+                <div class="card-title-group">
+                    <h2 class="card-title" id="interventionHeading">Care Intervention Details</h2>
+                </div>
+                <div class="card-badges" id="encounterBadges">
+                    <span class="risk-badge risk-high" id="encounterRiskBadge" style="display: none;">HIGH RISK</span>
+                    <span class="status-badge status-pending" id="encounterStatusBadge" style="display: none;">PENDING REVIEW</span>
+                </div>
+            </div>
+
+            <div class="card-body">
+                <form id="interventionForm" class="intervention-form" novalidate>
+                    
+                    <!-- Row 1: Encounter Id (left) & Patient Number (right) -->
+                    <div class="form-grid-2">
+                        <div class="form-group">
+                            <label for="encounterIdInput" class="form-label">
+                                Encounter Id
+                            </label>
+                            <input 
+                                type="number" 
+                                id="encounterIdInput" 
+                                name="encounterId" 
+                                class="form-control" 
+                                placeholder="e.g. 67162368" 
+                                required
+                            >
+                        </div>
+
+                        <div class="form-group">
+                            <label for="patientNumberInput" class="form-label">
+                                Patient Number
+                            </label>
+                            <input 
+                                type="number" 
+                                id="patientNumberInput" 
+                                name="patientNumber" 
+                                class="form-control" 
+                                placeholder="Patient ID..."
+                                readonly
+                            >
+                        </div>
+                    </div>
+
+                    <!-- Row 2: Status ComboBox (left) & Assigned To (right) -->
+                    <div class="form-grid-2">
+                        <div class="form-group">
+                            <label for="statusSelect" class="form-label">
+                                Status
+                                <span class="hint">(ComboBox)</span>
+                            </label>
+                            <select id="statusSelect" name="status" class="form-control" required>
+                                <option value="PENDING_REVIEW">PENDING_REVIEW</option>
+                                <option value="ASSIGNED">ASSIGNED</option>
+                                <option value="CONTACTED">CONTACTED</option>
+                                <option value="FOLLOW_UP_SCHEDULED">FOLLOW_UP_SCHEDULED</option>
+                                <option value="CLOSED">CLOSED</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="assignedToInput" class="form-label">
+                                Assigned To
+                            </label>
+                            <input 
+                                type="text" 
+                                id="assignedToInput" 
+                                name="assignedTo" 
+                                class="form-control" 
+                                placeholder="e.g. Nurse Joy, Care Team Alpha..."
+                                maxlength="100"
+                                autocomplete="off"
+                            >
+                        </div>
+                    </div>
+
+                    <!-- Row 3: Notes (full width) -->
+                    <div class="form-group">
+                        <label for="notesInput" class="form-label">
+                            Notes
+                        </label>
+                        <textarea 
+                            id="notesInput" 
+                            name="notes" 
+                            class="form-control notes-textarea" 
+                            placeholder="Enter clinical notes, care management actions, or follow-up details..."
+                            rows="3"
+                        ></textarea>
+                    </div>
+
+                    <!-- Actions Row with Update Button (Wireframe: "Update v") -->
+                    <div class="form-actions-right">
+                        <button type="button" id="fetchStatusBtn" class="btn btn-secondary" title="Reload intervention data from backend">
+                            Fetch Status
+                        </button>
+                        <button type="submit" id="updateBtn" class="btn btn-primary btn-update">
+                            Update <span class="arrow-down">&#9662;</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+        <!-- Lower Card: List the update here (Wireframe: "List the update here") -->
+        <section class="card" id="updateListCard" aria-labelledby="updateListHeading">
+            <div class="card-header">
+                <div class="card-title-group">
+                    <h2 class="card-title" id="updateListHeading" style="color: var(--slate-800);">
+                        List the update here
+                    </h2>
+                </div>
+                <div class="results-header-actions">
+                    <span class="badge-count" id="updateCountBadge">0 Updates</span>
+                </div>
+            </div>
+
+            <div class="card-body" style="padding: 0;">
+
+                <!-- Loading State Spinner -->
+                <div id="interventionLoadingState" class="state-container" style="display: none;">
+                    <div class="spinner" aria-hidden="true"></div>
+                    <div class="state-title">Fetching Intervention Details...</div>
+                    <div class="state-desc">Querying FastAPI endpoint via CORS (GET /interventions/{encounter_id})</div>
+                </div>
+
+                <!-- Empty State Message -->
+                <div id="noUpdatesState" class="state-container">
+                    <svg class="state-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                        <line x1="16" y1="13" x2="8" y2="13"></line>
+                        <line x1="16" y1="17" x2="8" y2="17"></line>
+                        <polyline points="10 9 9 9 8 9"></polyline>
+                    </svg>
+                    <div class="state-title" id="noUpdatesTitle">No Updates Recorded Yet</div>
+                    <div class="state-desc" id="noUpdatesDesc">Enter or load an Encounter ID, adjust status or notes above, and click "Update &#9662;" to record updates.</div>
+                </div>
+
+                <!-- Updates Table / List Display -->
+                <div id="updatesTableContainer" class="table-responsive" style="display: none;">
+                    <table class="data-table" id="updatesTable">
+                        <thead>
+                            <tr>
+                                <th>Update Time</th>
+                                <th>Encounter ID</th>
+                                <th>Patient Nbr</th>
+                                <th>Status</th>
+                                <th>Assigned To</th>
+                                <th>Clinical Notes</th>
+                                <th>Persistence</th>
+                            </tr>
+                        </thead>
+                        <tbody id="updatesTableBody">
+                            <!-- Dynamically generated update log rows -->
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="app-footer">
+        <p>Diabetes Readmission Intervention Queue &copy; 2026 &bull; Frontend CORS Client</p>
+    </footer>
+
+    <!-- JavaScript Controller -->
+    <script src="../js/intervention.js"></script>
+</body>
+</html>

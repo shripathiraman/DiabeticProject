@@ -695,7 +695,8 @@ select.form-control {
         margin-top: 1rem;
     }
 
-    .form-grid {
+    .form-grid,
+    .form-grid-2 {
         grid-template-columns: 1fr;
     }
 
@@ -712,4 +713,221 @@ select.form-control {
     .buttons-group .btn {
         flex: 1;
     }
+
+    .header-right-group {
+        width: 100%;
+        justify-content: space-between;
+    }
+}
+
+/* --------------------------------------------------------------------------
+   13. Care Intervention & Encounter Linking Styles (Wireframe Right Screen)
+   -------------------------------------------------------------------------- */
+
+/* Clickable Encounter ID Link */
+.encounter-id-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: var(--primary-700);
+    text-decoration: none;
+    padding: 0.3rem 0.65rem;
+    background: var(--primary-50);
+    border: 1px solid var(--primary-200);
+    border-radius: var(--radius-sm);
+    font-weight: 700;
+    font-size: 0.92rem;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 1px 2px rgba(2, 132, 199, 0.08);
+}
+
+.encounter-id-link:hover {
+    background: var(--primary-600);
+    color: #ffffff;
+    border-color: var(--primary-600);
+    transform: translateX(3px);
+    box-shadow: 0 3px 8px rgba(2, 132, 199, 0.28);
+}
+
+.encounter-id-link .link-arrow {
+    font-size: 0.85rem;
+    transition: transform 0.2s ease;
+}
+
+.encounter-id-link:hover .link-arrow {
+    transform: translateX(2px);
+}
+
+/* 2-Column Form Grid for Intervention Screen */
+.form-grid-2 {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+    align-items: flex-start;
+}
+
+/* Notes Textarea */
+.notes-textarea {
+    resize: vertical;
+    min-height: 84px;
+    font-family: inherit;
+    line-height: 1.5;
+}
+
+/* Form Actions Right Aligned (matches "Update v" button in wireframe) */
+.form-actions-right {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 1rem;
+    padding-top: 1rem;
+    border-top: 1px dashed var(--slate-200);
+}
+
+.btn-update {
+    padding: 0.75rem 2rem;
+    font-size: 1rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+    box-shadow: 0 4px 10px rgba(2, 132, 199, 0.25);
+}
+
+.btn-update:hover {
+    background: linear-gradient(135deg, #0369a1 0%, #075985 100%);
+    box-shadow: 0 6px 14px rgba(2, 132, 199, 0.35);
+    transform: translateY(-1px);
+}
+
+.arrow-down {
+    display: inline-block;
+    font-size: 0.85rem;
+    margin-left: 0.4rem;
+    transition: transform 0.2s ease;
+}
+
+.btn-update:hover .arrow-down {
+    transform: translateY(2px);
+}
+
+/* Header Right Group & Navigation */
+.header-right-group {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.back-nav-btn {
+    padding: 0.5rem 1rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    border-radius: var(--radius-md);
+    background: #ffffff;
+    color: var(--primary-700);
+    border: 1px solid var(--primary-200);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    transition: all 0.2s ease;
+}
+
+.back-nav-btn:hover {
+    background: var(--primary-50);
+    border-color: var(--primary-400);
+    color: var(--primary-900);
+}
+
+/* Card Header Badges */
+.card-badges {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* Success Banner */
+.success-banner {
+    background-color: #ecfdf5;
+    border: 1.5px solid #a7f3d0;
+    color: #065f46;
+    border-radius: var(--radius-md);
+    padding: 1rem 1.25rem;
+    margin-bottom: 1.5rem;
+    display: none;
+    align-items: center;
+    gap: 0.75rem;
+    box-shadow: var(--shadow-sm);
+}
+
+.success-banner.visible {
+    display: flex;
+    animation: slideDown 0.25s cubic-bezier(0, 0, 0.2, 1);
+}
+
+.success-banner svg {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+    stroke: #10b981;
+}
+
+/* List the update here Styles */
+.latest-update-row {
+    background-color: #f0fdf4 !important;
+    border-left: 4px solid #10b981;
+}
+
+.update-timestamp {
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: var(--slate-700);
+}
+
+.update-tag-latest {
+    display: inline-block;
+    background: #10b981;
+    color: #ffffff;
+    font-size: 0.65rem;
+    font-weight: 800;
+    letter-spacing: 0.05em;
+    padding: 0.15rem 0.45rem;
+    border-radius: 4px;
+    margin-left: 0.5rem;
+    text-transform: uppercase;
+}
+
+.persisted-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    background: #ecfdf5;
+    color: #065f46;
+    border: 1px solid #a7f3d0;
+    font-size: 0.76rem;
+    font-weight: 700;
+    padding: 0.25rem 0.6rem;
+    border-radius: 9999px;
+}
+
+.persisted-pill .check-icon {
+    font-weight: 900;
+    color: #10b981;
+}
+
+.assigned-user-pill {
+    background: var(--slate-100);
+    color: var(--slate-700);
+    border: 1px solid var(--slate-200);
+    font-size: 0.84rem;
+    font-weight: 600;
+    padding: 0.25rem 0.6rem;
+    border-radius: var(--radius-sm);
+}
+
+.notes-cell {
+    max-width: 320px;
+    word-break: break-word;
+    font-size: 0.88rem;
+    color: var(--slate-700);
+    line-height: 1.45;
 }

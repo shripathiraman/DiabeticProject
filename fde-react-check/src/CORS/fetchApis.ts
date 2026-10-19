@@ -69,6 +69,27 @@ export interface PatientSearchResult extends Encounter {
     notes?: string | null;
 }
 
+/** Care Intervention record */
+export interface Intervention {
+    intervention_id: number;
+    encounter_id: number;
+    patient_nbr?: number | null;
+    risk_level?: RiskLevel | null;
+    risk_score?: number | null;
+    status: InterventionStatus;
+    assigned_to: string | null;
+    notes: string | null;
+    created_at: string;
+    updated_at: string;
+}
+
+/** Payload for updating care intervention */
+export interface InterventionUpdate {
+    status?: InterventionStatus;
+    assigned_to?: string;
+    notes?: string;
+}
+
 /** Filters for patient search (supports ID and/or Risk Score and/or Risk Level) */
 export interface PatientSearchParams {
     patient_nbr?: number;
@@ -207,6 +228,34 @@ export async function searchPatients(params: PatientSearchParams = {}): Promise<
     const queryString = searchParams.toString();
     const endpoint = `/patients/search${queryString ? `?${queryString}` : ""}`;
     return apiGet<PatientSearchResult[]>(endpoint);
+}
+
+/**
+ * 10. GET /interventions/{encounter_id} - Fetch care intervention status
+ */
+export async function fetchInterventionByEncounterId(encounterId: number): Promise<Intervention> {
+    return apiGet<Intervention>(`/interventions/${encounterId}`);
+}
+
+/**
+ * 11. PATCH /interventions/{encounter_id} - Update care intervention workflow status/assignee/notes
+ */
+export async function updateIntervention(encounterId: number, data: InterventionUpdate): Promise<Intervention> {
+    const url = `${BASE_URL}/interventions/${encounterId}`;
+    const response = await fetch(url, {
+        method: "PATCH",
+        headers: {
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+        },
+        body: JSON.stringify(data),
+    });
+
+    if (!response.ok) {
+        throw new Error(`API Error [${response.status} ${response.statusText}] at ${url}`);
+    }
+
+    return (await response.json()) as Intervention;
 }
 
 

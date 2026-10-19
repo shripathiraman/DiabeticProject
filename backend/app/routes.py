@@ -135,7 +135,21 @@ def get_high_risk_care_queue(
 # ---------------------------------------------------------------------------
 # 5. Intervention Management Endpoints
 # ---------------------------------------------------------------------------
+@router.get("/interventions/{encounter_id}", response_model=Intervention, tags=["Interventions"])
+@router.get("/api/interventions/{encounter_id}", response_model=Intervention, tags=["Interventions"], include_in_schema=False)
+def get_intervention(encounter_id: int):
+    """Fetch care intervention record and workflow status for a given encounter ID."""
+    intervention = repository.get_intervention_by_encounter_id(encounter_id)
+    if not intervention:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Encounter {encounter_id} not found.",
+        )
+    return intervention
+
+
 @router.patch("/interventions/{encounter_id}", response_model=Intervention, tags=["Interventions"])
+@router.patch("/api/interventions/{encounter_id}", response_model=Intervention, tags=["Interventions"], include_in_schema=False)
 def update_intervention(encounter_id: int, payload: InterventionUpdate):
     """Update workflow status, assignee, or clinical notes for an intervention."""
     data = payload.model_dump(exclude_unset=True) if hasattr(payload, "model_dump") else payload.dict(exclude_unset=True)
@@ -157,7 +171,7 @@ def update_intervention(encounter_id: int, payload: InterventionUpdate):
     if not updated_row:
         raise HTTPException(
             status_code=404,
-            detail=f"Intervention for encounter {encounter_id} not found. Only MEDIUM and HIGH risk encounters have interventions.",
+            detail=f"Encounter {encounter_id} not found.",
         )
 
     return updated_row

@@ -73,6 +73,9 @@ class Intervention(BaseModel):
     """Represents a care intervention record for high or medium risk encounters."""
     intervention_id: int
     encounter_id: int
+    patient_nbr: Optional[int] = None
+    risk_level: Optional[RiskLevel] = None
+    risk_score: Optional[int] = None
     status: InterventionStatus
     assigned_to: Optional[str] = None
     notes: Optional[str] = None

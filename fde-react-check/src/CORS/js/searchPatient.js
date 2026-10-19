@@ -182,7 +182,14 @@ function renderTable(patients) {
         const interventionStatus = patient.intervention_status || patient.status || null;
 
         tr.innerHTML = `
-            <td><strong>#${encounterId}</strong></td>
+            <td>
+                <a href="intervention.html?encounter_id=${encodeURIComponent(patient.encounter_id)}&patient_nbr=${encodeURIComponent(patient.patient_nbr)}" 
+                   class="encounter-id-link" 
+                   title="Click to view and update care intervention for Encounter #${encounterId}">
+                    <strong>#${encounterId}</strong>
+                    <span class="link-arrow">&rarr;</span>
+                </a>
+            </td>
             <td><span class="patient-id-badge">${patientNbr}</span></td>
             <td>${age}</td>
             <td>${timeInHospital}</td>
@@ -352,6 +359,10 @@ function handleSearch(e) {
     if (riskLevel) params.risk_level = riskLevel;
     if (riskScore !== '') params.risk_score = Number(riskScore);
 
+    try {
+        sessionStorage.setItem('last_patient_search', JSON.stringify(params));
+    } catch (_) {}
+
     fetchPatients(params);
 }
 
@@ -359,6 +370,10 @@ function handleSearch(e) {
  * Reset / Clear Form handler
  */
 function handleReset() {
+    try {
+        sessionStorage.removeItem('last_patient_search');
+    } catch (_) {}
+
     elements.searchForm.reset();
     hideError();
     state.patients = [];
@@ -407,6 +422,30 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Health check only (keep search fields and table blank by default)
+    // Health check verification
     checkApiHealth();
+
+    // Check for saved search parameters (e.g. when returning from intervention update page)
+    try {
+        const saved = sessionStorage.getItem('last_patient_search');
+        if (saved) {
+            const params = JSON.parse(saved);
+            let hasParams = false;
+            if (params.patient_nbr) {
+                elements.patientNumberInput.value = params.patient_nbr;
+                hasParams = true;
+            }
+            if (params.risk_level) {
+                elements.riskLevelSelect.value = params.risk_level;
+                hasParams = true;
+            }
+            if (params.risk_score !== undefined && params.risk_score !== null) {
+                elements.riskScoreInput.value = params.risk_score;
+                hasParams = true;
+            }
+            if (hasParams) {
+                fetchPatients(params);
+            }
+        }
+    } catch (_) {}
 });

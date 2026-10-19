@@ -191,11 +191,22 @@ def query_care_queue(
 # Interventions
 # ---------------------------------------------------------------------------
 def get_intervention_by_encounter_id(encounter_id: int) -> Optional[dict[str, Any]]:
-    """Fetch intervention record for a given encounter ID."""
+    """Fetch intervention record for a given encounter ID enriched with patient details."""
     sql = """
-        SELECT intervention_id, encounter_id, status, assigned_to, notes, created_at, updated_at
-        FROM care_interventions
-        WHERE encounter_id = %s;
+        SELECT 
+            COALESCE(i.intervention_id, 0) AS intervention_id,
+            e.encounter_id,
+            e.patient_nbr,
+            e.risk_level,
+            e.risk_score,
+            COALESCE(i.status, 'PENDING_REVIEW') AS status,
+            i.assigned_to,
+            i.notes,
+            COALESCE(i.created_at, NOW()) AS created_at,
+            COALESCE(i.updated_at, NOW()) AS updated_at
+        FROM patient_encounters e
+        LEFT JOIN care_interventions i ON i.encounter_id = e.encounter_id
+        WHERE e.encounter_id = %s;
     """
     return fetch_one(sql, (encounter_id,))
 
@@ -207,42 +218,65 @@ def update_intervention(
     notes: Optional[str] = None,
 ) -> Optional[dict[str, Any]]:
     """Update workflow status, assignee, or clinical notes for an intervention."""
-    updates: list[str] = []
-    params: list[Any] = []
+    encounter = get_encounter_by_id(encounter_id)
+    if not encounter:
+        return None
 
-    if status is not None:
-        updates.append("status = %s")
-        params.append(status)
-
-    if assigned_to is not None:
-        updates.append("assigned_to = %s")
-        params.append(assigned_to)
-
-    if notes is not None:
-        updates.append("notes = %s")
-        params.append(notes)
-
-    if not updates:
-        return get_intervention_by_encounter_id(encounter_id)
-
-    params.append(encounter_id)
-    sql = f"""
-        UPDATE care_interventions
-        SET {", ".join(updates)}
-        WHERE encounter_id = %s
-        RETURNING intervention_id, encounter_id, status, assigned_to, notes, created_at, updated_at;
-    """
+    existing = fetch_one("SELECT intervention_id, encounter_id, status, assigned_to, notes, created_at, updated_at FROM care_interventions WHERE encounter_id = %s", (encounter_id,))
 
     conn = get_dict_connection()
     try:
         with conn.cursor() as cursor:
-            cursor.execute(sql, tuple(params))
-            updated_row = cursor.fetchone()
+            if existing:
+                updates: list[str] = []
+                params: list[Any] = []
+
+                if status is not None:
+                    updates.append("status = %s")
+                    params.append(status)
+
+                if assigned_to is not None:
+                    updates.append("assigned_to = %s")
+                    params.append(assigned_to)
+
+                if notes is not None:
+                    updates.append("notes = %s")
+                    params.append(notes)
+
+                if updates:
+                    params.append(encounter_id)
+                    sql = f"""
+                        UPDATE care_interventions
+                        SET {", ".join(updates)}
+                        WHERE encounter_id = %s
+                        RETURNING intervention_id, encounter_id, status, assigned_to, notes, created_at, updated_at;
+                    """
+                    cursor.execute(sql, tuple(params))
+                    updated_row = cursor.fetchone()
+                else:
+                    updated_row = existing
+            else:
+                sql = """
+                    INSERT INTO care_interventions (encounter_id, status, assigned_to, notes)
+                    VALUES (%s, COALESCE(%s, 'PENDING_REVIEW'), %s, %s)
+                    RETURNING intervention_id, encounter_id, status, assigned_to, notes, created_at, updated_at;
+                """
+                cursor.execute(sql, (encounter_id, status, assigned_to, notes))
+                updated_row = cursor.fetchone()
+
         conn.commit()
+        if updated_row:
+            row_dict = dict(updated_row)
+            row_dict["patient_nbr"] = encounter["patient_nbr"]
+            row_dict["risk_level"] = encounter["risk_level"]
+            row_dict["risk_score"] = encounter["risk_score"]
+            return row_dict
+        return None
+    except Exception:
+        conn.rollback()
+        raise
     finally:
         conn.close()
-
-    return dict(updated_row) if updated_row else None
 
 
 # ---------------------------------------------------------------------------
