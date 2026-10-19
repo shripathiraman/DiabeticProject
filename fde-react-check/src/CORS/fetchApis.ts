@@ -57,6 +57,28 @@ export interface CareQueueItem extends Encounter {
     updated_at: string;
 }
 
+/**
+ * Patient search result matching backend GET /patients/search
+ * Combines encounter fields with optional care intervention status
+ */
+export interface PatientSearchResult extends Encounter {
+    intervention_id?: number | null;
+    status?: InterventionStatus | null;
+    intervention_status?: string | null;
+    assigned_to?: string | null;
+    notes?: string | null;
+}
+
+/** Filters for patient search (supports ID and/or Risk Score and/or Risk Level) */
+export interface PatientSearchParams {
+    patient_nbr?: number;
+    risk_score?: number;
+    risk_level?: RiskLevel;
+    limit?: number;
+    offset?: number;
+}
+
+
 /** Operations summary metrics */
 export interface OperationsSummary {
     total_encounters: number;
@@ -159,6 +181,35 @@ export async function fetchManagementDashboard(): Promise<ManagementDashboard> {
     return apiGet<ManagementDashboard>("/management/dashboard");
 }
 
+/**
+ * 9. GET /patients/search - Search for Patient by Id and/or Risk Score and/or Risk Level
+ * Calls FastAPI backend and returns strongly typed PatientSearchResult[]
+ */
+export async function searchPatients(params: PatientSearchParams = {}): Promise<PatientSearchResult[]> {
+    const searchParams = new URLSearchParams();
+
+    if (params.patient_nbr !== undefined) {
+        searchParams.append("patient_nbr", params.patient_nbr.toString());
+    }
+    if (params.risk_score !== undefined) {
+        searchParams.append("risk_score", params.risk_score.toString());
+    }
+    if (params.risk_level !== undefined) {
+        searchParams.append("risk_level", params.risk_level);
+    }
+    if (params.limit !== undefined) {
+        searchParams.append("limit", params.limit.toString());
+    }
+    if (params.offset !== undefined) {
+        searchParams.append("offset", params.offset.toString());
+    }
+
+    const queryString = searchParams.toString();
+    const endpoint = `/patients/search${queryString ? `?${queryString}` : ""}`;
+    return apiGet<PatientSearchResult[]>(endpoint);
+}
+
+
 // ============================================================================
 // 5. DEMO EXECUTION
 // ============================================================================
@@ -236,6 +287,34 @@ async function runDemo() {
         const dashboard: ManagementDashboard = await fetchManagementDashboard();
         console.log(`   Queue Size: ${dashboard.care_queue_size} (High: ${dashboard.high_risk_queue}, Medium: ${dashboard.medium_risk_queue})`);
         console.log(`   High-Risk Readmission Rate: ${dashboard.high_risk_readmission_rate}%\n`);
+
+        // 8. Patient Search (By ID and/or Risk Score and/or Risk Level)
+        console.log("8️⃣  Testing Patient Search (GET /patients/search)...");
+
+        // 8a. Search by Patient Number
+        console.log("   --> Search by Patient ID (patient_nbr = 84002391):");
+        const resultsByPatient = await searchPatients({ patient_nbr: 84002391 });
+        console.log(`       Found ${resultsByPatient.length} encounter(s) for patient 84002391`);
+
+        // 8b. Combined Search (patient_nbr + risk_score + risk_level)
+        console.log("   --> Combined Search (patient_nbr=84002391, risk_score=8, risk_level=HIGH):");
+        const combinedResults = await searchPatients({
+            patient_nbr: 84002391,
+            risk_score: 8,
+            risk_level: "HIGH",
+        });
+        console.table(
+            combinedResults.map((r) => ({
+                encounter_id: r.encounter_id,
+                patient_nbr: r.patient_nbr,
+                age: r.age,
+                time_in_hospital: `${r.time_in_hospital} days`,
+                risk_score: r.risk_score,
+                risk_level: r.risk_level,
+                intervention_status: r.intervention_status ?? "None",
+            }))
+        );
+        console.log();
 
         console.log("✅ All GET endpoints successfully queried and validated against TypeScript Interfaces!");
     } catch (err) {
