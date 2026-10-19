@@ -1,0 +1,715 @@
+/* ==========================================================================
+   app.css - Diabetes Patient Management UI Stylesheet
+   Modern, responsive clinical management theme
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. Design System & CSS Variables
+   -------------------------------------------------------------------------- */
+:root {
+    /* Color Palette */
+    --primary-50: #f0f9ff;
+    --primary-100: #e0f2fe;
+    --primary-200: #bae6fd;
+    --primary-300: #7dd3fc;
+    --primary-400: #38bdf8;
+    --primary-500: #0ea5e9;
+    --primary-600: #0284c7;
+    --primary-700: #0369a1;
+    --primary-800: #075985;
+    --primary-900: #0c4a6e;
+
+    /* Neutrals & Slate */
+    --slate-50: #f8fafc;
+    --slate-100: #f1f5f9;
+    --slate-200: #e2e8f0;
+    --slate-300: #cbd5e1;
+    --slate-400: #94a3b8;
+    --slate-500: #64748b;
+    --slate-600: #475569;
+    --slate-700: #334155;
+    --slate-800: #1e293b;
+    --slate-900: #0f172a;
+
+    /* Risk Badges */
+    --risk-high-bg: #fee2e2;
+    --risk-high-text: #991b1b;
+    --risk-high-border: #fca5a5;
+    --risk-high-dot: #ef4444;
+
+    --risk-med-bg: #fef3c7;
+    --risk-med-text: #92400e;
+    --risk-med-border: #fcd34d;
+    --risk-med-dot: #f59e0b;
+
+    --risk-low-bg: #d1fae5;
+    --risk-low-text: #065f46;
+    --risk-low-border: #6ee7b7;
+    --risk-low-dot: #10b981;
+
+    /* Status Badges */
+    --status-pending-bg: #e0e7ff;
+    --status-pending-text: #3730a3;
+    --status-assigned-bg: #fef9c3;
+    --status-assigned-text: #854d0e;
+    --status-contacted-bg: #e0f2fe;
+    --status-contacted-text: #075985;
+    --status-followup-bg: #fae8ff;
+    --status-followup-text: #86198f;
+    --status-closed-bg: #f1f5f9;
+    --status-closed-text: #475569;
+
+    /* UI Measurements */
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --radius-lg: 14px;
+    --radius-xl: 18px;
+
+    /* Shadows */
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.04);
+    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+
+    /* Fonts */
+    --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
+/* --------------------------------------------------------------------------
+   2. Reset & Base Styles
+   -------------------------------------------------------------------------- */
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    font-size: 15px;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+    font-family: var(--font-sans);
+    background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+    color: var(--slate-800);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* --------------------------------------------------------------------------
+   3. Application Header (Top Bar matching wireframe)
+   -------------------------------------------------------------------------- */
+.app-header {
+    background: linear-gradient(90deg, #bae6fd 0%, #7dd3fc 50%, #38bdf8 100%);
+    border-bottom: 2px solid #0284c7;
+    box-shadow: var(--shadow-md);
+    padding: 1rem 2rem;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.header-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.header-title-group {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.header-icon {
+    width: 36px;
+    height: 36px;
+    background: #0284c7;
+    color: white;
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: var(--shadow-sm);
+}
+
+.header-icon svg {
+    width: 22px;
+    height: 22px;
+    stroke: currentColor;
+    stroke-width: 2.2;
+    fill: none;
+}
+
+.app-title {
+    font-size: 1.45rem;
+    font-weight: 700;
+    color: #075985;
+    letter-spacing: -0.02em;
+}
+
+.api-status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.4rem 0.85rem;
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(6px);
+    border: 1px solid rgba(2, 132, 199, 0.3);
+    border-radius: 9999px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: #0369a1;
+}
+
+.status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: #10b981;
+    box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.25);
+}
+
+.status-dot.disconnected {
+    background-color: #ef4444;
+    box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.25);
+}
+
+/* --------------------------------------------------------------------------
+   4. Main Content Layout
+   -------------------------------------------------------------------------- */
+.main-wrapper {
+    max-width: 1200px;
+    width: 100%;
+    margin: 1.75rem auto;
+    padding: 0 1.5rem 3rem;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 1.75rem;
+}
+
+/* --------------------------------------------------------------------------
+   5. Card System
+   -------------------------------------------------------------------------- */
+.card {
+    background: #ffffff;
+    border-radius: var(--radius-xl);
+    border: 1px solid var(--slate-200);
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card-header {
+    padding: 1.25rem 1.75rem;
+    border-bottom: 1px solid var(--slate-200);
+    background: linear-gradient(180deg, #ffffff 0%, var(--slate-50) 100%);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+}
+
+.card-title-group {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+.card-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #0284c7; /* Highlighted blue as in sample wireframe */
+    letter-spacing: -0.01em;
+}
+
+.card-body {
+    padding: 1.75rem;
+}
+
+/* --------------------------------------------------------------------------
+   6. Search Patient Form
+   -------------------------------------------------------------------------- */
+.search-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1.5rem;
+    align-items: flex-start;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.form-label {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--slate-700);
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.form-label .hint {
+    font-size: 0.78rem;
+    color: var(--slate-400);
+    font-weight: 400;
+}
+
+.form-control {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    font-size: 0.95rem;
+    font-family: inherit;
+    color: var(--slate-800);
+    background-color: var(--slate-50);
+    border: 1.5px solid var(--slate-300);
+    border-radius: var(--radius-md);
+    outline: none;
+    transition: all 0.2s ease;
+}
+
+.form-control:focus {
+    background-color: #ffffff;
+    border-color: var(--primary-500);
+    box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.2);
+}
+
+.form-control::placeholder {
+    color: var(--slate-400);
+}
+
+/* Select / ComboBox Dropdown */
+select.form-control {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%230f172a' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    background-size: 1rem;
+    padding-right: 2.5rem;
+    cursor: pointer;
+}
+
+/* Form Actions Row (matches "Search >" button placement) */
+.form-actions-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+    padding-top: 0.5rem;
+    border-top: 1px dashed var(--slate-200);
+}
+
+.quick-filters {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.quick-filter-label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--slate-500);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.chip-btn {
+    padding: 0.35rem 0.75rem;
+    font-size: 0.82rem;
+    font-weight: 500;
+    background: var(--slate-100);
+    border: 1px solid var(--slate-300);
+    color: var(--slate-700);
+    border-radius: 9999px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.chip-btn:hover {
+    background: var(--primary-100);
+    border-color: var(--primary-400);
+    color: var(--primary-700);
+}
+
+.buttons-group {
+    display: flex;
+    gap: 0.75rem;
+    margin-left: auto;
+}
+
+/* --------------------------------------------------------------------------
+   7. Buttons
+   -------------------------------------------------------------------------- */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.6rem;
+    font-size: 1rem;
+    font-weight: 600;
+    font-family: inherit;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    border: none;
+    outline: none;
+    text-decoration: none;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+    color: #ffffff;
+    box-shadow: 0 4px 10px rgba(2, 132, 199, 0.3);
+    border: 1px solid #0284c7;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, #0369a1 0%, #075985 100%);
+    box-shadow: 0 6px 14px rgba(2, 132, 199, 0.4);
+    transform: translateY(-1px);
+}
+
+.btn-primary:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 6px rgba(2, 132, 199, 0.3);
+}
+
+.btn-primary .arrow {
+    font-weight: 800;
+    font-size: 1.15rem;
+    line-height: 1;
+    transition: transform 0.2s ease;
+}
+
+.btn-primary:hover .arrow {
+    transform: translateX(3px);
+}
+
+.btn-secondary {
+    background: #ffffff;
+    color: var(--slate-700);
+    border: 1.5px solid var(--slate-300);
+}
+
+.btn-secondary:hover {
+    background: var(--slate-100);
+    border-color: var(--slate-400);
+    color: var(--slate-900);
+}
+
+/* --------------------------------------------------------------------------
+   8. Results Data Table Section
+   -------------------------------------------------------------------------- */
+.results-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.badge-count {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.35rem 0.75rem;
+    background: var(--primary-100);
+    color: var(--primary-800);
+    border-radius: 9999px;
+    font-size: 0.85rem;
+    font-weight: 700;
+}
+
+.table-responsive {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    text-align: left;
+    font-size: 0.92rem;
+}
+
+.data-table th {
+    background: var(--slate-100);
+    color: var(--slate-700);
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.78rem;
+    letter-spacing: 0.05em;
+    padding: 0.95rem 1.1rem;
+    border-bottom: 2px solid var(--slate-200);
+    white-space: nowrap;
+    position: sticky;
+    top: 0;
+}
+
+.data-table td {
+    padding: 0.95rem 1.1rem;
+    border-bottom: 1px solid var(--slate-200);
+    color: var(--slate-800);
+    white-space: nowrap;
+    transition: background-color 0.15s ease;
+}
+
+.data-table tbody tr {
+    transition: background-color 0.15s ease, transform 0.15s ease;
+}
+
+.data-table tbody tr:hover {
+    background-color: var(--primary-50);
+}
+
+.data-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* --------------------------------------------------------------------------
+   9. Badges & Indicators
+   -------------------------------------------------------------------------- */
+.risk-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.35rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    border: 1px solid transparent;
+}
+
+.risk-badge::before {
+    content: '';
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+}
+
+.risk-badge.risk-high {
+    background-color: var(--risk-high-bg);
+    color: var(--risk-high-text);
+    border-color: var(--risk-high-border);
+}
+.risk-badge.risk-high::before {
+    background-color: var(--risk-high-dot);
+    box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2);
+}
+
+.risk-badge.risk-medium {
+    background-color: var(--risk-med-bg);
+    color: var(--risk-med-text);
+    border-color: var(--risk-med-border);
+}
+.risk-badge.risk-medium::before {
+    background-color: var(--risk-med-dot);
+    box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.2);
+}
+
+.risk-badge.risk-low {
+    background-color: var(--risk-low-bg);
+    color: var(--risk-low-text);
+    border-color: var(--risk-low-border);
+}
+.risk-badge.risk-low::before {
+    background-color: var(--risk-low-dot);
+    box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
+}
+
+/* Status Badges */
+.status-badge {
+    display: inline-block;
+    padding: 0.3rem 0.65rem;
+    border-radius: var(--radius-sm);
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: capitalize;
+}
+
+.status-badge.status-pending_review {
+    background: var(--status-pending-bg);
+    color: var(--status-pending-text);
+}
+
+.status-badge.status-assigned {
+    background: var(--status-assigned-bg);
+    color: var(--status-assigned-text);
+}
+
+.status-badge.status-contacted {
+    background: var(--status-contacted-bg);
+    color: var(--status-contacted-text);
+}
+
+.status-badge.status-follow_up_scheduled {
+    background: var(--status-followup-bg);
+    color: var(--status-followup-text);
+}
+
+.status-badge.status-closed {
+    background: var(--status-closed-bg);
+    color: var(--status-closed-text);
+}
+
+.status-badge.status-none {
+    background: var(--slate-100);
+    color: var(--slate-400);
+    font-style: italic;
+}
+
+/* Readmission Tag */
+.readmitted-tag {
+    font-weight: 600;
+    font-size: 0.85rem;
+}
+.readmitted-tag.urgent {
+    color: #dc2626;
+}
+.readmitted-tag.later {
+    color: #d97706;
+}
+.readmitted-tag.no {
+    color: #059669;
+}
+
+/* --------------------------------------------------------------------------
+   10. States: Loading, Empty, Error
+   -------------------------------------------------------------------------- */
+.state-container {
+    padding: 3.5rem 1.5rem;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.spinner {
+    width: 44px;
+    height: 44px;
+    border: 3.5px solid var(--slate-200);
+    border-top-color: var(--primary-600);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.state-title {
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: var(--slate-700);
+}
+
+.state-desc {
+    font-size: 0.9rem;
+    color: var(--slate-500);
+    max-width: 420px;
+    line-height: 1.5;
+}
+
+.state-icon {
+    width: 56px;
+    height: 56px;
+    color: var(--slate-400);
+    stroke-width: 1.5;
+}
+
+.error-banner {
+    display: none;
+    margin: 1rem 0;
+    padding: 1rem 1.25rem;
+    background-color: #fef2f2;
+    border: 1px solid #fecaca;
+    border-radius: var(--radius-md);
+    color: #991b1b;
+    font-size: 0.92rem;
+    align-items: flex-start;
+    gap: 0.75rem;
+}
+
+.error-banner.visible {
+    display: flex;
+}
+
+.error-banner svg {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+/* --------------------------------------------------------------------------
+   11. Footer
+   -------------------------------------------------------------------------- */
+.app-footer {
+    text-align: center;
+    padding: 1.5rem;
+    font-size: 0.85rem;
+    color: var(--slate-500);
+    border-top: 1px solid var(--slate-200);
+    background-color: #ffffff;
+    margin-top: auto;
+}
+
+/* --------------------------------------------------------------------------
+   12. Responsive Adjustments
+   -------------------------------------------------------------------------- */
+@media (max-width: 768px) {
+    .app-header {
+        padding: 0.85rem 1rem;
+    }
+    
+    .app-title {
+        font-size: 1.2rem;
+    }
+
+    .main-wrapper {
+        padding: 0 1rem 2rem;
+        margin-top: 1rem;
+    }
+
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .form-actions-row {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .buttons-group {
+        margin-left: 0;
+        justify-content: stretch;
+    }
+
+    .buttons-group .btn {
+        flex: 1;
+    }
+}

@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Diabetes Patient Management - Search patient encounters by ID, risk score, and risk level.">
+    <title>Diabetes Patient Management | Patient Search</title>
+
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Stylesheet -->
+    <link rel="stylesheet" href="../css/app.css">
+</head>
+<body>
+
+    <!-- Top Application Banner / Header (Wireframe: "Diabetes Patient Management") -->
+    <header class="app-header">
+        <div class="header-container">
+            <div class="header-title-group">
+                <div class="header-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+                    </svg>
+                </div>
+                <h1 class="app-title">Diabetes Patient Management</h1>
+            </div>
+
+            <!-- Backend CORS / API Status Indicator -->
+            <div class="api-status-pill" id="apiStatusPill" title="FastAPI Backend Status">
+                <span class="status-dot" id="statusDot"></span>
+                <span id="statusText">Checking API...</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="main-wrapper">
+
+        <!-- Error Notification Banner -->
+        <div class="error-banner" id="errorBanner" role="alert">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="8" x2="12" y2="12"></line>
+                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+            <div id="errorMessage">An unexpected error occurred.</div>
+        </div>
+
+        <!-- Search Patient Card (Wireframe Form Area) -->
+        <section class="card" id="searchCard" aria-labelledby="searchHeading">
+            <div class="card-header">
+                <div class="card-title-group">
+                    <h2 class="card-title" id="searchHeading">Search Patient</h2>
+                </div>
+            </div>
+
+            <div class="card-body">
+                <form id="searchForm" class="search-form" novalidate>
+                    <div class="form-grid">
+                        
+                        <!-- 1. Patient Number Input -->
+                        <div class="form-group">
+                            <label for="patientNumber" class="form-label">
+                                Patient Number
+                                <span class="hint">(e.g. 84002391)</span>
+                            </label>
+                            <input 
+                                type="number" 
+                                id="patientNumber" 
+                                name="patientNumber" 
+                                class="form-control" 
+                                placeholder="Enter patient ID number..." 
+                                min="1"
+                                autocomplete="off"
+                            >
+                        </div>
+
+                        <!-- 2. Risk Level ComboBox -->
+                        <div class="form-group">
+                            <label for="riskLevel" class="form-label">
+                                Risk Level
+                                <span class="hint">(ComboBox)</span>
+                            </label>
+                            <select id="riskLevel" name="riskLevel" class="form-control">
+                                <option value="" selected></option>
+                                <option value="ALL">All risk level</option>
+                                <option value="LOW">Low</option>
+                                <option value="MEDIUM">Medium</option>
+                                <option value="HIGH">High</option>
+                            </select>
+                        </div>
+
+                        <!-- 3. Risk Score Input -->
+                        <div class="form-group">
+                            <label for="riskScore" class="form-label">
+                                Risk Score
+                                <span class="hint">(0 to 8)</span>
+                            </label>
+                            <input 
+                                type="number" 
+                                id="riskScore" 
+                                name="riskScore" 
+                                class="form-control" 
+                                placeholder="" 
+                                min="0" 
+                                max="8"
+                                autocomplete="off"
+                            >
+                        </div>
+
+                    </div>
+
+                    <!-- Actions Row with Search Button and Quick Test Filters -->
+                    <div class="form-actions-row">
+                        <div class="quick-filters">
+                            <span class="quick-filter-label">Quick Test:</span>
+                            <button type="button" class="chip-btn" data-patient="84002391">Patient #84002391</button>
+                            <button type="button" class="chip-btn" data-level="HIGH">High Risk</button>
+                            <button type="button" class="chip-btn" data-score="8">Score = 8</button>
+                            <button type="button" class="chip-btn" data-level="ALL">All Risk Levels</button>
+                        </div>
+
+                        <div class="buttons-group">
+                            <button type="button" id="resetBtn" class="btn btn-secondary">
+                                Reset
+                            </button>
+                            <!-- Search Button matching wireframe "Search >" -->
+                            <button type="submit" id="searchBtn" class="btn btn-primary">
+                                Search <span class="arrow">&gt;</span>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+        <!-- Results Table Card (Wireframe: "Table showing the details") -->
+        <section class="card" id="resultsCard" aria-labelledby="resultsHeading">
+            <div class="card-header">
+                <div class="card-title-group">
+                    <h2 class="card-title" id="resultsHeading" style="color: var(--slate-800);">Encounter Details</h2>
+                </div>
+                <div class="results-header-actions">
+                    <span class="badge-count" id="resultCountBadge">0 Records</span>
+                </div>
+            </div>
+
+            <div class="card-body" style="padding: 0;">
+                
+                <!-- Loading State Spinner -->
+                <div id="loadingState" class="state-container" style="display: none;">
+                    <div class="spinner" aria-hidden="true"></div>
+                    <div class="state-title">Fetching Patient Encounters...</div>
+                    <div class="state-desc">Querying FastAPI endpoint via CORS (GET /patients/search)</div>
+                </div>
+
+                <!-- Empty State Message -->
+                <div id="emptyState" class="state-container">
+                    <svg class="state-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                    <div class="state-title" id="emptyStateTitle">No Search Criteria Provided</div>
+                    <div class="state-desc" id="emptyStateDesc">Please enter a Patient Number, select a Risk Level, or enter a Risk Score, then click Search.</div>
+                </div>
+
+                <!-- Table Display -->
+                <div id="tableContainer" class="table-responsive" style="display: none;">
+                    <table class="data-table" id="patientsTable">
+                        <thead>
+                            <tr>
+                                <th>Encounter ID</th>
+                                <th>Patient Nbr</th>
+                                <th>Age Group</th>
+                                <th>Hospital Stay</th>
+                                <th>Risk Score</th>
+                                <th>Risk Level</th>
+                                <th>Readmitted</th>
+                                <th>Prior Visits (In/ER/Out)</th>
+                                <th>Medications</th>
+                                <th>Intervention Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="patientsTableBody">
+                            <!-- Dynamically generated rows -->
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="app-footer">
+        <p>Diabetes Readmission Intervention Queue &copy; 2026 &bull; Frontend CORS Client</p>
+    </footer>
+
+    <!-- JavaScript Controller -->
+    <script src="../js/searchPatient.js"></script>
+</body>
+</html>
