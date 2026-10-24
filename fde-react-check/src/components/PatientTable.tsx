@@ -5,9 +5,10 @@ import { PatientRow } from "./PatientRow";
 interface PatientTableProps {
     patients: encounters[];
     pagination?: ReactNode;
+    onEncounterSelect?: (patient: encounters) => void;
 }
 
-export const PatientTable = ({ patients, pagination }: PatientTableProps) => {
+export const PatientTable = ({ patients, pagination, onEncounterSelect }: PatientTableProps) => {
     return (
         <div className="table-card">
             <div className="table-wrapper">
@@ -32,7 +33,11 @@ export const PatientTable = ({ patients, pagination }: PatientTableProps) => {
                     </thead>
                     <tbody>
                         {patients.map((patient) => (
-                            <PatientRow key={patient.encounter_id} patient={patient} />
+                            <PatientRow
+                                key={patient.encounter_id}
+                                patient={patient}
+                                onEncounterSelect={onEncounterSelect}
+                            />
                         ))}
                     </tbody>
                 </table>

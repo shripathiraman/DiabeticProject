@@ -9,7 +9,7 @@
 
 /* --- Header Styling --- */
 .app-header {
-  margin-bottom: 2rem;
+  margin-bottom: 1.25rem;
   border-bottom: 1px solid #e2e8f0;
   padding-bottom: 1.25rem;
   display: flex;
@@ -32,6 +32,386 @@
   font-size: 0.95rem;
 }
 
+.patient-top-menu {
+  display: flex;
+  gap: 0.5rem;
+  margin: 0 0 1.25rem;
+  border-bottom: 1px solid #cbd5e1;
+}
+
+.patient-top-menu-item {
+  padding: 0.75rem 1.25rem;
+  color: #475569;
+  background: transparent;
+  border: 0;
+  border-bottom: 3px solid transparent;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.patient-top-menu-item:hover {
+  color: #1d4ed8;
+}
+
+.patient-top-menu-item.active {
+  color: #1d4ed8;
+  border-bottom-color: #2563eb;
+}
+
+.patient-screen {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.management-card {
+  overflow: hidden;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+.management-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid #e2e8f0;
+  background: #f8fafc;
+}
+
+.management-card-header h2 {
+  margin: 0;
+  color: #0f172a;
+  font-size: 1.15rem;
+}
+
+.management-card-body {
+  display: grid;
+  gap: 1.25rem;
+  padding: 1.25rem;
+}
+
+.management-form-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+  align-items: start;
+}
+
+.management-field {
+  display: grid;
+  min-width: 0;
+  gap: 0.45rem;
+  color: #334155;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.management-field input,
+.management-field select,
+.management-field textarea {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  padding: 0.65rem 0.75rem;
+  color: #1e293b;
+  background: #fff;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  font: inherit;
+  font-weight: 400;
+}
+
+.management-field input,
+.management-field select {
+  height: 42px;
+}
+
+.management-field input:focus,
+.management-field select:focus,
+.management-field textarea:focus {
+  outline: 2px solid #bfdbfe;
+  border-color: #3b82f6;
+}
+
+.management-field input[readonly] {
+  background: #f8fafc;
+}
+
+.management-form-actions,
+.management-actions,
+.patient-quick-filters {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.management-form-actions {
+  justify-content: space-between;
+  padding-top: 1rem;
+  border-top: 1px dashed #e2e8f0;
+}
+
+.management-form-actions > * {
+  min-width: 0;
+}
+
+.patient-quick-filters {
+  color: #64748b;
+  font-size: 0.8rem;
+}
+
+.patient-quick-filters button {
+  padding: 0.35rem 0.65rem;
+  color: #475569;
+  background: #f8fafc;
+  border: 1px solid #cbd5e1;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.patient-quick-filters button:hover {
+  color: #1d4ed8;
+  border-color: #93c5fd;
+}
+
+.management-actions .btn-secondary,
+.management-actions .btn-primary {
+  padding: 0.55rem 1rem;
+}
+
+.results-card-header {
+  min-height: 3.5rem;
+}
+
+.management-count {
+  padding: 0.3rem 0.7rem;
+  color: #1e40af;
+  background: #dbeafe;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.management-table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.management-table {
+  width: 100%;
+  min-width: 900px;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+
+.management-table th {
+  padding: 0.8rem 0.9rem;
+  color: #475569;
+  background: #f8fafc;
+  border-bottom: 1px solid #e2e8f0;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+}
+
+.management-table td {
+  padding: 0.75rem 0.9rem;
+  color: #334155;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.management-table tbody tr:hover {
+  background: #f8fafc;
+}
+
+.management-empty-state {
+  margin: 0;
+  padding: 2rem 1.25rem;
+  color: #64748b;
+  text-align: center;
+}
+
+.encounter-link {
+  padding: 0;
+  color: #2563eb;
+  background: transparent;
+  border: 0;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.encounter-link:hover {
+  text-decoration: underline;
+}
+
+.risk-label {
+  display: inline-block;
+  padding: 0.25rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.risk-label.risk-high {
+  color: #b91c1c;
+  background: #fee2e2;
+}
+
+.risk-label.risk-medium {
+  color: #b45309;
+  background: #fef3c7;
+}
+
+.risk-label.risk-low {
+  color: #15803d;
+  background: #dcfce7;
+}
+
+.intervention-actions {
+  justify-content: flex-end;
+}
+
+.history-notes {
+  min-width: 220px;
+  max-width: 420px;
+  white-space: normal !important;
+}
+
+.status-success {
+  color: #166534;
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+}
+
+.encounter-details-modal {
+  width: min(1100px, 100%);
+  min-width: 0;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
+}
+
+.encounter-details-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.5rem;
+  background: #f8fafc;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.encounter-details-header h2 {
+  margin: 0;
+  color: #0f172a;
+  font-size: 1.25rem;
+}
+
+.encounter-details-content {
+  min-height: 0;
+  overflow-y: auto;
+  padding: 1.25rem;
+}
+
+.encounter-details-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 0.75rem;
+  margin: 0 0 1.5rem;
+}
+
+.encounter-detail {
+  min-width: 0;
+  padding: 0.75rem;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+}
+
+.encounter-detail dt {
+  margin-bottom: 0.3rem;
+  color: #64748b;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.encounter-detail dd {
+  margin: 0;
+  color: #1e293b;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 640px) {
+  .app-container {
+    padding: 1.25rem 0.75rem;
+  }
+
+  .app-header {
+    margin-bottom: 1rem;
+    align-items: flex-start;
+  }
+
+  .patient-top-menu {
+    margin-bottom: 1rem;
+  }
+
+  .management-card-header,
+  .management-card-body {
+    padding: 1rem;
+  }
+
+  .management-form-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .patient-quick-filters {
+    align-items: flex-start;
+  }
+
+  .management-actions {
+    justify-content: flex-end;
+  }
+
+  .encounter-details-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .encounter-details-content {
+    padding: 0.75rem;
+  }
+}
+
+@media (max-width: 760px) {
+  .management-form-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 380px) {
+  .encounter-details-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .management-form-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
 
 /* --- Table Card & Responsive Scroll Container --- */
 .table-card {

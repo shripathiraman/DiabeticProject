@@ -1,12 +1,29 @@
 import type { encounters } from "../type";
 
+interface PatientRowProps {
+    patient: encounters;
+    onEncounterSelect?: (patient: encounters) => void;
+}
 
-export const PatientRow = ({ patient }: { patient: encounters }) => {
+export const PatientRow = ({ patient, onEncounterSelect }: PatientRowProps) => {
     const riskClass = `risk-${patient.risk_level?.toLowerCase() || 'low'}`;
     return (
         <tr>
             <td>{patient.patient_nbr}</td>
-            <td>{patient.encounter_id}</td>
+            <td>
+                {onEncounterSelect ? (
+                    <button
+                        type="button"
+                        className="encounter-link"
+                        onClick={() => onEncounterSelect(patient)}
+                        aria-label={`View details for encounter ${patient.encounter_id}`}
+                    >
+                        {patient.encounter_id}
+                    </button>
+                ) : (
+                    patient.encounter_id
+                )}
+            </td>
             <td>{patient.age}</td>
             <td>{patient.time_in_hospital}</td>
             <td>{patient.number_inpatient}</td>

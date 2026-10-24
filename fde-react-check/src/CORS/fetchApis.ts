@@ -1,3 +1,18 @@
+import type {
+    Intervention,
+    InterventionHistoryItem,
+    InterventionUpdate,
+    PatientSearchParams,
+    PatientSearchResult,
+} from "../type";
+export type {
+    Intervention,
+    InterventionHistoryItem,
+    InterventionUpdate,
+    PatientSearchParams,
+    PatientSearchResult,
+} from "../type";
+
 /**
  * TypeScript Script demonstrating Interfaces and fetching from FastAPI GET endpoints.
  * Backend Docs: http://127.0.0.1:8000/docs
@@ -56,60 +71,6 @@ export interface CareQueueItem extends Encounter {
     created_at: string;
     updated_at: string;
 }
-
-/**
- * Patient search result matching backend GET /patients/search
- * Combines encounter fields with optional care intervention status
- */
-export interface PatientSearchResult extends Encounter {
-    intervention_id?: number | null;
-    status?: InterventionStatus | null;
-    intervention_status?: string | null;
-    assigned_to?: string | null;
-    notes?: string | null;
-}
-
-/** Care Intervention record */
-export interface Intervention {
-    intervention_id: number;
-    encounter_id: number;
-    patient_nbr?: number | null;
-    risk_level?: RiskLevel | null;
-    risk_score?: number | null;
-    status: InterventionStatus;
-    assigned_to: string | null;
-    notes: string | null;
-    created_at: string;
-    updated_at: string;
-}
-
-/** Payload for updating care intervention */
-export interface InterventionUpdate {
-    status?: InterventionStatus;
-    assigned_to?: string;
-    notes?: string;
-}
-
-/** Immutable audit history entry from care_intervention_history table */
-export interface InterventionHistoryItem {
-    history_id: number;
-    encounter_id: number;
-    patient_nbr?: number | null;
-    status: InterventionStatus;
-    assigned_to: string | null;
-    notes: string | null;
-    changed_at: string;
-}
-
-/** Filters for patient search (supports ID and/or Risk Score and/or Risk Level) */
-export interface PatientSearchParams {
-    patient_nbr?: number;
-    risk_score?: number;
-    risk_level?: RiskLevel;
-    limit?: number;
-    offset?: number;
-}
-
 
 /** Operations summary metrics */
 export interface OperationsSummary {
